@@ -1,30 +1,31 @@
 package jm.task.core.jdbc.util;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import jm.task.core.jdbc.model.User;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+
+import org.hibernate.service.ServiceRegistry;
 
 public class Util {
-    private String userName = "root";
-    private String password = "root";
-    private String connectionUrl = "jdbc:mysql://localhost:3306/test";
-    private Connection connection = null;
+    private static final String userName = "root";
+    private static final String password = "root";
+    private static final String connectionUrl = "jdbc:mysql://localhost:3306/test";
 
-    private Util() {
-        try {
-            connection = DriverManager.getConnection(connectionUrl, userName, password);
-        } catch (SQLException e) {
-            System.out.printf("Не подключился");
-        }
+
+    public static SessionFactory getConnection() {
+        Configuration configuration = new Configuration();
+        configuration.setProperty("hibernate.connection.url", connectionUrl);
+        configuration.setProperty("hibernate.connection.username", userName);
+        configuration.setProperty("hibernate.connection.password", password);
+        configuration.addAnnotatedClass(User.class);
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                .applySettings(configuration.getProperties()).build();
+        return configuration.buildSessionFactory(serviceRegistry);
     }
 
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public static Util getInstance() {
-        return new Util();
-    }
 }
 
 
